@@ -1,4 +1,4 @@
-# Sync Video - 双人同步观看视频系统
+# HeartSync - 双人同步观看视频系统
 
 [![Go Version](https://img.shields.io/badge/Go-1.20+-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
