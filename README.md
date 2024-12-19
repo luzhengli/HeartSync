@@ -5,6 +5,9 @@
 
 一个简单的双人同步观看视频系统，支持实时同步播放、暂停和进度控制。
 
+![alt text](image.png)
+![alt text](video.png)
+
 ## 功能特点
 
 - 🎥 支持多种视频格式 (mp4, webm, ogg)
