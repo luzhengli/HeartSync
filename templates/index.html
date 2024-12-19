@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>同步视频观看</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>同步视频观看</h1>
+        {{if .error}}
+        <div class="error">{{.error}}</div>
+        {{end}}
+        
+        <div class="create-room">
+            <h2>创建房间</h2>
+            <form id="createRoomForm">
+                <input type="text" name="video_url" placeholder="输入视频URL" required>
+                <button type="submit">创建房间</button>
+            </form>
+        </div>
+
+        <div class="join-room">
+            <h2>加入房间</h2>
+            <form id="joinRoomForm">
+                <input type="text" name="room_id" placeholder="输入房间号" required>
+                <button type="submit">加入房间</button>
+            </form>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+</body>
+</html> 

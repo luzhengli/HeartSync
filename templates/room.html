@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>房间 {{.roomID}} - 同步视频观看</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="room-container">
+        <div class="video-container">
+            <video id="videoPlayer" controls>
+                <source src="{{.video}}" type="video/mp4">
+                您的浏览器不支持 HTML5 视频播放
+            </video>
+        </div>
+        <div class="room-info">
+            <p>房间号: {{.roomID}}</p>
+            <button id="copyRoomId">复制房间号</button>
+        </div>
+    </div>
+    <script>
+        // 将房间信息传递给JavaScript
+        window.ROOM_ID = "{{.roomID}}";
+        window.VIDEO_URL = "{{.video}}";
+    </script>
+    <script src="/static/js/room.js"></script>
+</body>
+</html> 
