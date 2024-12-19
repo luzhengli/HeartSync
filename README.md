@@ -31,8 +31,8 @@
 
 1. 克隆仓库
 ```bash
-git clone https://github.com/yourusername/sync-video.git
-cd sync-video
+git clone git@github.com:luzhengli/HeartSync.git
+cd HeartSync
 ```
 
 2. 安装依赖
