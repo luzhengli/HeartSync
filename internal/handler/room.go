@@ -48,6 +48,7 @@ func CreateRoom(c *gin.Context) {
 
 	roomService := service.GetRoomService()
 	room, err := roomService.CreateRoom()
+	// 如果房间创建失败 则返回错误
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

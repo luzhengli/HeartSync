@@ -21,9 +21,12 @@ func main() {
 	
 	// 注册路由
 	r.GET("/", handler.Index)
-	r.GET("/room/:id", handler.RoomPage)
-	r.POST("/room/create", handler.CreateRoom)
-	r.GET("/room/join/:id", handler.JoinRoom)
+	room := r.Group("room")
+	{
+		room.GET("/:id", handler.RoomPage)
+		room.POST("/create", handler.CreateRoom)
+		room.GET("/join/:id", handler.JoinRoom)
+	}
 	r.GET("/ws/:room_id", handler.HandleWebSocket)
 	
 	// 启动服务器

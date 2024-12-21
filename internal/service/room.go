@@ -16,6 +16,7 @@ var (
 	ErrInvalidRoom  = errors.New("无效的房间")
 )
 
+// RoomService 房间服务 通过锁来保证线程安全
 type RoomService struct {
 	rooms map[string]*model.Room
 	mu    sync.RWMutex
@@ -23,12 +24,12 @@ type RoomService struct {
 
 var (
 	roomService *RoomService
-	once        sync.Once
+	once        sync.Once // 使用单例模式
 )
 
 // GetRoomService 获取房间服务单例
 func GetRoomService() *RoomService {
-	once.Do(func() {
+	once.Do(func() { // Do 方法通过原子操作和双重验证锁来确保初始化是线程安全的 这里确保了roomService只初始化一次
 		roomService = &RoomService{
 			rooms: make(map[string]*model.Room),
 		}
@@ -39,9 +40,11 @@ func GetRoomService() *RoomService {
 
 // CreateRoom 创建新房间
 func (s *RoomService) CreateRoom() (*model.Room, error) {
+	// 加互斥锁 阻塞其他goroutine的读写操作
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	// 检查是否达到最大房间数限制
 	if len(s.rooms) >= config.MaxRooms {
 		return nil, errors.New("达到最大房间数限制")
 	}
@@ -55,6 +58,7 @@ func (s *RoomService) CreateRoom() (*model.Room, error) {
 
 // GetRoom 获取房间
 func (s *RoomService) GetRoom(roomID string) (*model.Room, error) {
+	// 加读锁 阻塞其他goroutine的写操作
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -68,8 +72,9 @@ func (s *RoomService) GetRoom(roomID string) (*model.Room, error) {
 // generateRoomID 生成房间ID
 func (s *RoomService) generateRoomID() string {
 	for {
-		// 生成6位随机数
+		// 生成6位随机数 这里id的可枚举数量要大于config.MaxRooms 否则程序会一直卡在生成id上
 		id := strconv.Itoa(100000 + rand.Intn(900000))
+		// 检查房间id是否已存在 如果存在则继续生成 否则返回
 		if _, exists := s.rooms[id]; !exists {
 			return id
 		}
