@@ -36,10 +36,12 @@ func HandleWebSocket(c *gin.Context) {
 	}
 	defer conn.Close()
 
+	var currentUser *model.User
 	// 更新用户的WebSocket连接
 	for _, user := range room.GetUsers() {
 		if user.ID == userID {
 			user.WSConn = conn
+			currentUser = user
 			break
 		}
 	}
@@ -53,11 +55,12 @@ func HandleWebSocket(c *gin.Context) {
 			break
 		}
 
-		// 广播消息给房间内其他用户
+		// 广播消息给房间内所有其他用户
 		for _, user := range room.GetUsers() {
-			if user.ID != userID && user.WSConn != nil { // 如果用户id不等于当前用户id 并且用户有websocket连接 则发送消息
+			if user.ID != msg.UserID && user.WSConn != nil {
 				wsConn := user.WSConn.(*websocket.Conn)
-				if err := wsConn.WriteJSON(msg); err != nil {
+				err := wsConn.WriteJSON(msg)
+				if err != nil {
 					log.Printf("发送消息失败: %v", err)
 				}
 			}
@@ -65,5 +68,8 @@ func HandleWebSocket(c *gin.Context) {
 	}
 
 	// 用户断开连接时清理
+	if currentUser != nil {
+		currentUser.WSConn = nil
+	}
 	room.RemoveUser(userID)
-} 
+}

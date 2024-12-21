@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
             if (response.ok) {
+                localStorage.setItem('user_id', data.user_id);
                 // 创建成功，加入房间
                 window.location.href = `/room/${data.room_id}`;
             } else {
@@ -41,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             if (response.ok) {
                 // 加入成功，进入房间
-                localStorage.setItem('user_id', data.user_id);
+                localStorage.setItem('user_id', data.user_id); 
                 window.location.href = `/room/${data.room_id}`;
             } else {
                 alert(data.error || '加入房间失败');

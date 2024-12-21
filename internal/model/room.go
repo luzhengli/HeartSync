@@ -26,14 +26,15 @@ type Room struct {
 // User 用户模型
 type User struct {
 	ID       string
-	WSConn   interface{} // WebSocket连接，具体类型后续实现
+	WSConn   interface{}
 	JoinedAt time.Time
 }
 
 // Message WebSocket消息结构
 type Message struct {
-	Type string      `json:"type"`
-	Data interface{} `json:"data"`
+	Type   string      `json:"type"`
+	Data   interface{} `json:"data"`
+	UserID string      `json:"userId"`
 }
 
 // NewRoom 创建新房间
@@ -85,10 +86,10 @@ func (r *Room) updateStatus() {
 func (r *Room) GetUsers() []*User {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	
+
 	users := make([]*User, 0, len(r.Users))
 	for _, user := range r.Users {
 		users = append(users, user)
 	}
 	return users
-} 
+}

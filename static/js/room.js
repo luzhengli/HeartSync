@@ -7,6 +7,8 @@ class VideoSync {
         this.syncThreshold = 1; // 同步阈值（秒）
         this.lastUpdate = 0;
         this.connecting = false;
+        this.isRemoteUpdate = false; // 添加标志位
+        this.updateInterval = 1000; // 更新间隔（毫秒）
     }
 
     // 初始化
@@ -23,7 +25,7 @@ class VideoSync {
 
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${protocol}//${window.location.host}/ws/${this.roomId}?user_id=${this.userId}`;
-        
+
         this.ws = new WebSocket(wsUrl);
 
         this.ws.onopen = () => {
@@ -51,13 +53,22 @@ class VideoSync {
     // 绑定视频事件
     bindVideoEvents() {
         // 播放/暂停
-        this.video.onplay = () => this.sendMessage('play');
-        this.video.onpause = () => this.sendMessage('pause');
+        this.video.onplay = () => {
+            if (!this.isRemoteUpdate) {
+                this.sendMessage('play');
+            }
+        };
 
-        // 进度更新
+        this.video.onpause = () => {
+            if (!this.isRemoteUpdate) {
+                this.sendMessage('pause');
+            }
+        };
+
+        // 进度更新 - 优化更新频率
         this.video.ontimeupdate = () => {
             const now = Date.now();
-            if (now - this.lastUpdate > 1000) { // 限制更新频率
+            if (!this.isRemoteUpdate && now - this.lastUpdate > this.updateInterval) {
                 this.sendMessage('seek', this.video.currentTime);
                 this.lastUpdate = now;
             }
@@ -76,13 +87,20 @@ class VideoSync {
 
     // 发送消息
     sendMessage(type, data = null) {
+        if (this.isRemoteUpdate) return; // 如果是远程更新触发的事件,不发送消息
+
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            this.ws.send(JSON.stringify({ type, data }));
+            this.ws.send(JSON.stringify({
+                type,
+                data,
+                userId: this.userId
+            }));
         }
     }
 
     // 处理接收到的消息
     handleMessage(message) {
+        this.isRemoteUpdate = true; // 设置远程更新标志
         switch (message.type) {
             case 'play':
                 if (this.video.paused) {
@@ -101,11 +119,14 @@ class VideoSync {
                 }
                 break;
         }
+        setTimeout(() => {
+            this.isRemoteUpdate = false;
+        }, 100); // 短暂延迟后重置标志
     }
 }
 
 // 初始化视频同步
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const videoPlayer = document.getElementById('videoPlayer');
     const videoSync = new VideoSync(window.ROOM_ID, videoPlayer);
     videoSync.init();

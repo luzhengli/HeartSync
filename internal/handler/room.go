@@ -61,9 +61,27 @@ func CreateRoom(c *gin.Context) {
 	}
 
 	room.VideoURL = videoURL
+
+	user := &model.User{
+		ID:       uuid.New().String(),
+		JoinedAt: time.Now(),
+	}
+
+	if !room.AddUser(user) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "房间已满",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
+		"user_id": user.ID,
 		"room_id": room.ID,
 	})
+
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"room_id": room.ID,
+	// })
 }
 
 // JoinRoom 加入房间
