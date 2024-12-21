@@ -18,6 +18,8 @@ func Index(c *gin.Context) {
 }
 
 // RoomPage 房间页面处理
+// 获取房间信息 并渲染到页面
+// 如果房间不存在 则返回错误页面
 func RoomPage(c *gin.Context) {
 	roomID := c.Param("id")
 	roomService := service.GetRoomService()
@@ -37,6 +39,8 @@ func RoomPage(c *gin.Context) {
 }
 
 // CreateRoom 创建房间
+// 创建房间 并返回房间id
+// 如果视频URL为空 则返回错误
 func CreateRoom(c *gin.Context) {
 	videoURL := c.PostForm("video_url")
 	if videoURL == "" {
@@ -63,6 +67,9 @@ func CreateRoom(c *gin.Context) {
 }
 
 // JoinRoom 加入房间
+// 获取房间信息 并返回房间id
+// 如果房间不存在 则返回错误
+// 如果房间已满 则返回错误
 func JoinRoom(c *gin.Context) {
 	roomID := c.Param("id")
 	roomService := service.GetRoomService()

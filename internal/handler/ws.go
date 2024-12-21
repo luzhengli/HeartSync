@@ -55,7 +55,7 @@ func HandleWebSocket(c *gin.Context) {
 
 		// 广播消息给房间内其他用户
 		for _, user := range room.GetUsers() {
-			if user.ID != userID && user.WSConn != nil {
+			if user.ID != userID && user.WSConn != nil { // 如果用户id不等于当前用户id 并且用户有websocket连接 则发送消息
 				wsConn := user.WSConn.(*websocket.Conn)
 				if err := wsConn.WriteJSON(msg); err != nil {
 					log.Printf("发送消息失败: %v", err)

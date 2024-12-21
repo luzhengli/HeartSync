@@ -85,7 +85,7 @@ func (r *Room) updateStatus() {
 func (r *Room) GetUsers() []*User {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-
+	
 	users := make([]*User, 0, len(r.Users))
 	for _, user := range r.Users {
 		users = append(users, user)

@@ -30,10 +30,10 @@ var (
 // GetRoomService 获取房间服务单例
 func GetRoomService() *RoomService {
 	once.Do(func() { // Do 方法通过原子操作和双重验证锁来确保初始化是线程安全的 这里确保了roomService只初始化一次
-		roomService = &RoomService{
-			rooms: make(map[string]*model.Room),
+		roomService = &RoomService{ // 初始化房间服务
+			rooms: make(map[string]*model.Room), 
 		}
-		go roomService.startCleanup()
+		go roomService.startCleanup() // 启动清理过期房间的goroutine
 	})
 	return roomService
 }
@@ -83,7 +83,7 @@ func (s *RoomService) generateRoomID() string {
 
 // startCleanup 启动清理过期房间的goroutine
 func (s *RoomService) startCleanup() {
-	ticker := time.NewTicker(1 * time.Hour)
+	ticker := time.NewTicker(1 * time.Hour) // 每小时清理一次过期房间
 	for range ticker.C {
 		s.cleanupExpiredRooms()
 	}
@@ -94,7 +94,7 @@ func (s *RoomService) cleanupExpiredRooms() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	expireTime := time.Now().Add(-time.Duration(config.RoomExpireHours) * time.Hour)
+	expireTime := time.Now().Add(-time.Duration(config.RoomExpireHours) * time.Hour) // 将 当前时间-有效时间 与 房间创建时间 比较 如果房间创建时间小于有效时间 则删除房间
 	for id, room := range s.rooms {
 		if room.CreatedAt.Before(expireTime) && len(room.GetUsers()) == 0 {
 			delete(s.rooms, id)
